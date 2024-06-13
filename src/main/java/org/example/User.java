@@ -1,5 +1,6 @@
 package org.example;
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "users") // Annotation @Table pour spécifier le nom de la table dans la base de données
@@ -8,7 +9,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    @Column(unique = true,nullable = false)
     private String username;
     private String password;
 
@@ -47,4 +48,5 @@ public class User {
     public void setPassword(String password) {
         this.password = password;
     }
+
 }

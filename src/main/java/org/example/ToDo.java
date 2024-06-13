@@ -11,6 +11,10 @@ public class ToDo {
     private Long id;
     private String title;
     private boolean completed;
+    @ManyToOne()
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
 
     // Getters and setters
     public Long getId() {
@@ -35,5 +39,12 @@ public class ToDo {
 
     public void setCompleted(boolean completed) {
         this.completed = completed;
+    }
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

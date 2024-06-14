@@ -2,6 +2,7 @@ package org.example;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,22 +19,28 @@ public class UserController {
     private UserRepository userRepository;
 
     @PostMapping("/register")
-    public Object registerUser(@RequestBody User user) {
+    public ResponseEntity<?> registerUser(@RequestBody User user) {
         if (userRepository.findByUsername(user.getUsername()) != null) {
-            return ResponseEntity.ok().body(Collections.singletonMap("message", "Utilisateur déjà existant"));
+            // Renvoie un statut HTTP 409 (Conflict) si l'utilisateur existe déjà
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Collections.singletonMap("message", "Utilisateur déjà existant"));
         }
         userRepository.save(user);
-        return ResponseEntity.ok().body(Collections.singletonMap("message", "Utilisateur enregistré avec succès"));
+        // Renvoie un statut HTTP 200 (OK) avec un message de succès si l'enregistrement est réussi
+        return ResponseEntity.ok(Collections.singletonMap("message", "Utilisateur enregistré avec succès"));
     }
 
     @PostMapping("/login")
-    public Object loginUser(@RequestBody User user) {
-        User existingUser = userRepository.findByUsername(user.getUsername());
-        if (existingUser == null || !existingUser.getPassword().equals(user.getPassword())) {
-            return ResponseEntity.ok().body(Collections.singletonMap("message", "Nom d'utilisateur ou mot de passe incorrect"));
+    public ResponseEntity<Object> loginUser(@RequestBody User user) {
+        User foundUser = userRepository.findByUsername(user.getUsername());
+        if (foundUser == null || !foundUser.getPassword().equals(user.getPassword())) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Collections.singletonMap("message", "Identifiant ou mot de passe incorrect"));
         }
-        return ResponseEntity.ok().body(Collections.singletonMap("message", "Authentification réussie"));
+        // Authentification réussie, renvoyer une réponse appropriée
+        return ResponseEntity.ok().body(Collections.singletonMap("message", "Connexion réussie"));
     }
+
     // Ajouter un endpoint pour afficher tous les utilisateurs
     @GetMapping("/all")
     public ResponseEntity<List<User>> getAllUsers() {
